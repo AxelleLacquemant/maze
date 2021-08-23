@@ -1,7 +1,9 @@
 import tkinter as tk
 import math
+import os
 import level
 from level import *
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 class LevelEditor():
     def __init__(self, size):
