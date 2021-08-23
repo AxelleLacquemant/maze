@@ -1,25 +1,28 @@
 import tkinter as tk
 import math
-import os
+import level
 from level import *
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-class Mescouilles():
+class LevelEditor():
     def __init__(self, size):
         self.size = size
         self.grid = [[self.border_test(i,j) for i in range(self.size)] for j in range(self.size)]
 
         self.root = tk.Tk()
 
-        self.chsent = tk.Entry(self.root)
-        self.chsbtn = tk.Button(self.root, text="Load file", command=lambda:self.loadfile(self.chsent.get()))
+        self.ddmlist = []
+        self.lvllist()
+        self.ddmvar = tk.StringVar(self.root)
+
+        self.strddm = tk.OptionMenu(self.root, self.ddmvar, *self.ddmlist)
+        self.chsbtn = tk.Button(self.root, text="Load file", command=lambda:self.loadfile(self.ddmvar.get()))
         self.canv = tk.Canvas(self.root, width=self.size*10+2, height=self.size*10+2)
         self.entry = tk.Entry(self.root)
         self.svbtn = tk.Button(self.root, text="Save level", command=self.save)
 
         self.canv.bind("<Button-1>", self.clicked)
 
-        self.chsent.pack()
+        self.strddm.pack()
         self.chsbtn.pack()
         self.canv.pack()
         self.entry.pack()
@@ -34,6 +37,11 @@ class Mescouilles():
         self.canv.config(width=self.size*10+2, height=self.size*10+2)
         self.grid = globals()[c]
         self.updtdisp()
+
+    def lvllist(self):
+        for element in dir(level):
+            if str(element[0:2]) != "__" and str(element) != "test":
+                self.ddmlist.append(element)
     
     def border_test(self,x,y):
         if x == 0 or y == 0:

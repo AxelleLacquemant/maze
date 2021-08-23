@@ -1,8 +1,7 @@
 import tkinter as tk
-import os
+import level
 from level import *
 from maze_levelcreator import *
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 class Window:
     def __init__(self, level="level1"):
@@ -156,17 +155,22 @@ class StartWindow():
         self.root = tk.Tk()
         self.root.title = "Maze"
 
+        self.ddmlist = []
+        self.lvllist()
+        self.ddmvar = tk.StringVar(self.root)
+
         self.ttltxt = tk.Label(self.root, text="The Maze")
         self.strtxt = tk.Label(self.root, text="Enter a level:")
-        self.strent = tk.Entry(self.root)
-        self.strbtn = tk.Button(self.root, text="Play", command=lambda:Window(self.strent.get()))
+        self.strddm = tk.OptionMenu(self.root, self.ddmvar, *self.ddmlist)
+        self.strbtn = tk.Button(self.root, text="Play", command=lambda:Window(self.ddmvar.get()))
+        self.strbtn = tk.Button(self.root, text="Play", command=lambda:Window("test")) # DON'T UNCOMMENT, FOR TEST PURPOSE ONLY
         self.lctxt = tk.Label(self.root, text="Enter grid size:")
         self.lcent = tk.Entry(self.root)
-        self.lcbtn = tk.Button(self.root, text="Open Editor", command=lambda:Mescouilles(self.lcentverif()))
+        self.lcbtn = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.lcentverif()))
 
         self.ttltxt.grid(row = 0, column = 0, columnspan = 3)
         self.strtxt.grid(row = 1, column = 0)
-        self.strent.grid(row = 1, column = 1)
+        self.strddm.grid(row = 1, column = 1)
         self.strbtn.grid(row = 1, column = 2)
         self.lctxt.grid(row = 2, column = 0)
         self.lcent.grid(row = 2, column = 1)
@@ -181,6 +185,11 @@ class StartWindow():
             return 5
         else:
             return int(self.lcent.get())
+
+    def lvllist(self):
+        for element in dir(level):
+            if str(element[0:2]) != "__" and str(element) != "test":
+                self.ddmlist.append(element)
 
 if __name__ == "__main__":
     StartWindow()
