@@ -1,10 +1,13 @@
 import tkinter as tk
+from tkinter import messagebox
 import level
 from level import *
 from maze_levelcreator import *
 
 class Window:
-    def __init__(self, level="level1"):
+    def __init__(self, level):
+        if level == '':
+            level = "test"
         self.size = len(globals()[level])
         self.grid = globals()[level]
         self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
@@ -15,41 +18,42 @@ class Window:
         self.root.title("Maze")
         self.root.resizable(0,0)
 
-        self.disp_frame = tk.Frame(self.root)
-        self.cont_frame = tk.Frame(self.root)
+        self.display_frame = tk.Frame(self.root)
+        self.control_frame = tk.Frame(self.root)
         self.info_frame = tk.Frame(self.root)
 
-        self.disp_frame.grid(row = 0, column = 0, columnspan=2)
-        self.cont_frame.grid(row = 0, column = 2, columnspan=1)
+        self.display_frame.grid(row = 0, column = 0, columnspan=2)
+        self.control_frame.grid(row = 0, column = 2, columnspan=1)
         self.info_frame.grid(row = 1, column=0, columnspan=3)
 
-        self.disp_scrn = tk.Canvas(self.disp_frame, width=self.size*10+2, height=self.size*10+2)
+        self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2)
 
-        self.disp_scrn.pack()
+        self.display_screen.pack()
 
-        self.disp_lvl = tk.Label(self.info_frame, text="Level: "+str(level))
-        self.disp_scr = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
-        self.rstbtn = tk.Button(self.info_frame, text="Reset", command=self.reset)
+        self.display_level = tk.Label(self.info_frame, text="Level: "+str(level))
+        self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
+        self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
 
-        self.disp_lvl.pack()
-        self.disp_scr.pack()
-        self.rstbtn.pack()
+        self.display_level.pack()
+        self.display_score.pack()
+        self.reset_button.pack()
 
-        self.cont_u = tk.Button(self.cont_frame, text="ᐃ", width=4, height=2, command=lambda:self.move(0))
-        self.cont_l = tk.Button(self.cont_frame, text="ᐊ", width=4, height=2, command=lambda:self.move(1))
-        self.cont_r = tk.Button(self.cont_frame, text="ᐅ", width=4, height=2, command=lambda:self.move(2))
-        self.cont_d = tk.Button(self.cont_frame, text="ᐁ", width=4, height=2, command=lambda:self.move(3))
+        self.control_up = tk.Button(self.control_frame, text="ᐃ", width=4, height=2, command=lambda:self.move(0))
+        self.control_left = tk.Button(self.control_frame, text="ᐊ", width=4, height=2, command=lambda:self.move(1))
+        self.control_right = tk.Button(self.control_frame, text="ᐅ", width=4, height=2, command=lambda:self.move(2))
+        self.control_down = tk.Button(self.control_frame, text="ᐁ", width=4, height=2, command=lambda:self.move(3))
 
-        self.cont_u.grid(row = 0, column = 1)
-        self.cont_l.grid(row = 1, column = 0)
-        self.cont_r.grid(row = 1, column = 2)
-        self.cont_d.grid(row = 2, column = 1)
+        self.control_up.grid(row = 0, column = 1)
+        self.control_left.grid(row = 1, column = 0)
+        self.control_right.grid(row = 1, column = 2)
+        self.control_down.grid(row = 2, column = 1)
 
         self.y = 0
         self.x = 0
-        self.updtdisp()
+        self.updatedisplay()
         self.findstart()
 
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
 
     def gridcopy(self, m=0):
@@ -62,20 +66,20 @@ class Window:
                 for j in range(len(self.gridsave[i])):
                     self.grid[j][i] = self.gridsave[j][i]
 
-    def updtdisp(self):
-        self.disp_scrn.delete('all')
+    def updatedisplay(self):
+        self.display_screen.delete('all')
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] == 0:
-                    self.disp_scrn.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='white')
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='white')
                 if self.grid[i][j] == 1:
-                    self.disp_scrn.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='black')
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='black')
                 if self.grid[i][j] == 2:
-                    self.disp_scrn.create_oval(j*10+3, i*10+3, j*10+11, i*10+11, fill='green', outline='green')
+                    self.display_screen.create_oval(j*10+3, i*10+3, j*10+11, i*10+11, fill='green', outline='green')
                 if self.grid[i][j] == 3:
-                    self.disp_scrn.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='grey', outline="green")
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='grey', outline="green")
         
-        self.disp_scr.configure(text="Moves: "+str(self.moves))
+        self.display_score.configure(text="Moves: "+str(self.moves))
 
     def findstart(self):
         for i in range(len(self.grid)):
@@ -94,7 +98,7 @@ class Window:
                 self.y = self.y-1
             elif self.grid[self.y-1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.disp_scrn.create_rectangle(self.x*10+2, (self.y-1)*10+2, self.x*10+12, (self.y-1)*10+12, fill='green')
+                self.display_screen.create_rectangle(self.x*10+2, (self.y-1)*10+2, self.x*10+12, (self.y-1)*10+12, fill='green')
                 self.win()
         elif d == 1: #left
             if self.grid[self.y][self.x-1] == 0:
@@ -103,7 +107,7 @@ class Window:
                 self.x = self.x-1
             elif self.grid[self.y][self.x-1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.disp_scrn.create_rectangle((self.x-1)*10+2, self.y*10+2, (self.x-1)*10+12, self.y*10+12, fill='green')
+                self.display_screen.create_rectangle((self.x-1)*10+2, self.y*10+2, (self.x-1)*10+12, self.y*10+12, fill='green')
                 self.win()
         elif d == 2: #right
             if self.grid[self.y][self.x+1] == 0:
@@ -112,7 +116,7 @@ class Window:
                 self.x = self.x+1
             elif self.grid[self.y][self.x+1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.disp_scrn.create_rectangle((self.x+1)*10+2, self.y*10+2, (self.x+1)*10+12, self.y*10+12, fill='green')
+                self.display_screen.create_rectangle((self.x+1)*10+2, self.y*10+2, (self.x+1)*10+12, self.y*10+12, fill='green')
                 self.win()
         elif d == 3: #down
             if self.grid[self.y+1][self.x] == 0:
@@ -121,75 +125,79 @@ class Window:
                 self.y = self.y+1
             elif self.grid[self.y+1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.disp_scrn.create_rectangle(self.x*10+2, (self.y+1)*10+2, self.x*10+12, (self.y+1)*10+12, fill='green')
+                self.display_screen.create_rectangle(self.x*10+2, (self.y+1)*10+2, self.x*10+12, (self.y+1)*10+12, fill='green')
                 self.win()
-        self.updtdisp()
+        self.updatedisplay()
 
     def reset(self, w=0):
         self.moves = 0
         self.gridcopy(1)
         self.findstart()
-        self.updtdisp()
+        self.updatedisplay()
         if w == 1:
-            self.winwdw.destroy()
+            self.win_window.destroy()
 
     def quit(self, w=0):
         self.root.destroy()
         if w == 1:
-            self.winwdw.destroy()
+            self.win_window.destroy()
 
     def win(self):
-        self.winwdw = tk.Tk()
-        self.winwdw.title("Win !")
+        self.win_window = tk.Tk()
+        self.win_window.title("Win !")
 
-        self.wintxt = tk.Label(self.winwdw, text="Congratulations ! You made it out of the Maze")
-        self.winrstbtn = tk.Button(self.winwdw, text="Replay", command=lambda:self.reset(1))
-        self.winqutbtn = tk.Button(self.winwdw, text="Quit", command=lambda:self.quit(1))
+        self.win_text = tk.Label(self.win_window, text="Congratulations ! You made it out of the Maze")
+        self.win_reset_button = tk.Button(self.win_window, text="Replay", command=lambda:self.reset(1))
+        self.win_quit_button = tk.Button(self.win_window, text="Quit", command=lambda:self.quit(1))
 
-        self.wintxt.pack()
-        self.winrstbtn.pack()
-        self.winqutbtn.pack()
+        self.win_text.pack()
+        self.win_reset_button.pack()
+        self.win_quit_button.pack()
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Level progression will be lost. Do you want to quit?"):
+            self.reset()
+            self.root.destroy()
 
 class StartWindow():
     def __init__(self):
         self.root = tk.Tk()
         self.root.title = "Maze"
 
-        self.ddmlist = []
-        self.lvllist()
-        self.ddmvar = tk.StringVar(self.root)
+        self.dropdownmenu_list = []
+        self.levellist()
+        self.dropdownmenu_variable = tk.StringVar(self.root)
 
-        self.ttltxt = tk.Label(self.root, text="The Maze")
-        self.strtxt = tk.Label(self.root, text="Enter a level:")
-        self.strddm = tk.OptionMenu(self.root, self.ddmvar, *self.ddmlist)
-        self.strbtn = tk.Button(self.root, text="Play", command=lambda:Window(self.ddmvar.get()))
-        self.strbtn = tk.Button(self.root, text="Play", command=lambda:Window("test")) # DON'T UNCOMMENT, FOR TEST PURPOSE ONLY
-        self.lctxt = tk.Label(self.root, text="Enter grid size:")
-        self.lcent = tk.Entry(self.root)
-        self.lcbtn = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.lcentverif()))
+        self.title_text = tk.Label(self.root, text="The Maze")
+        self.start_text = tk.Label(self.root, text="Enter a level:")
+        self.start_dropdownmenu = tk.OptionMenu(self.root, self.dropdownmenu_variable, *self.dropdownmenu_list)
+        self.start_button = tk.Button(self.root, text="Play", command=lambda:Window(self.dropdownmenu_variable.get()))
+        self.levelcreator_text = tk.Label(self.root, text="Enter grid size:")
+        self.levelcreator_entry = tk.Entry(self.root)
+        self.levelcreator_button = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.levelcreator_entryverif()))
 
-        self.ttltxt.grid(row = 0, column = 0, columnspan = 3)
-        self.strtxt.grid(row = 1, column = 0)
-        self.strddm.grid(row = 1, column = 1)
-        self.strbtn.grid(row = 1, column = 2)
-        self.lctxt.grid(row = 2, column = 0)
-        self.lcent.grid(row = 2, column = 1)
-        self.lcbtn.grid(row = 2, column = 2)
+        self.title_text.grid(row = 0, column = 0, columnspan = 3)
+        self.start_text.grid(row = 1, column = 0)
+        self.start_dropdownmenu.grid(row = 1, column = 1)
+        self.start_button.grid(row = 1, column = 2)
+        self.levelcreator_text.grid(row = 2, column = 0)
+        self.levelcreator_entry.grid(row = 2, column = 1)
+        self.levelcreator_button.grid(row = 2, column = 2)
 
         self.root.mainloop()
 
-    def lcentverif(self):
-        if self.lcent.get() == "":
+    def levelcreator_entryverif(self):
+        if self.levelcreator_entry.get() == "":
             return 49
-        elif int(self.lcent.get()) < 5:
+        elif int(self.levelcreator_entry.get()) < 5:
             return 5
         else:
-            return int(self.lcent.get())
+            return int(self.levelcreator_entry.get())
 
-    def lvllist(self):
+    def levellist(self):
         for element in dir(level):
             if str(element[0:2]) != "__" and str(element) != "test":
-                self.ddmlist.append(element)
+                self.dropdownmenu_list.append(element)
 
 if __name__ == "__main__":
     StartWindow()
