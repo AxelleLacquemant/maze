@@ -13,10 +13,17 @@ class Window:
         self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
         self.gridcopy()
         self.moves = 0
+        self.playercolor = 'grey7'
+        self.floorcolor = 'grey98'
+        self.wallcolor = 'black'
+        self.endcolor = 'grey'
 
         self.root = tk.Tk()
         self.root.title("Maze")
         self.root.resizable(0,0)
+
+        self.dropdownmenu_list = ["Black", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Red"]
+        self.dropdownmenu_variable = tk.StringVar(self.root)
 
         self.display_frame = tk.Frame(self.root)
         self.control_frame = tk.Frame(self.root)
@@ -27,8 +34,12 @@ class Window:
         self.info_frame.grid(row = 1, column=0, columnspan=3)
 
         self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2)
-
-        self.display_screen.pack()
+        self.color_dropdownmenu = tk.OptionMenu(self.display_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
+        self.color_button = tk.Button(self.display_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
+        
+        self.display_screen.grid(row=0, column=0, columnspan=2)
+        self.color_dropdownmenu.grid(row=1, column=0)
+        self.color_button.grid(row=1, column=1)
 
         self.display_level = tk.Label(self.info_frame, text="Level: "+str(level))
         self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
@@ -68,16 +79,17 @@ class Window:
 
     def updatedisplay(self):
         self.display_screen.delete('all')
+
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] == 0:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='white')
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.floorcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 1:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='black')
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.wallcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 2:
-                    self.display_screen.create_oval(j*10+3, i*10+3, j*10+11, i*10+11, fill='green', outline='green')
+                    self.display_screen.create_oval(j*10+3, i*10+3, j*10+11, i*10+11, fill=self.playercolor, outline=self.wallcolor)
                 if self.grid[i][j] == 3:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill='grey', outline="green")
+                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.endcolor, outline=self.playercolor)
         
         self.display_score.configure(text="Moves: "+str(self.moves))
 
@@ -98,7 +110,7 @@ class Window:
                 self.y = self.y-1
             elif self.grid[self.y-1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle(self.x*10+2, (self.y-1)*10+2, self.x*10+12, (self.y-1)*10+12, fill='green')
+                self.display_screen.create_rectangle(self.x*10+2, (self.y-1)*10+2, self.x*10+12, (self.y-1)*10+12, fill=self.playercolor)
                 self.win()
         elif d == 1: #left
             if self.grid[self.y][self.x-1] == 0:
@@ -107,7 +119,7 @@ class Window:
                 self.x = self.x-1
             elif self.grid[self.y][self.x-1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle((self.x-1)*10+2, self.y*10+2, (self.x-1)*10+12, self.y*10+12, fill='green')
+                self.display_screen.create_rectangle((self.x-1)*10+2, self.y*10+2, (self.x-1)*10+12, self.y*10+12, fill=self.playercolor)
                 self.win()
         elif d == 2: #right
             if self.grid[self.y][self.x+1] == 0:
@@ -116,7 +128,7 @@ class Window:
                 self.x = self.x+1
             elif self.grid[self.y][self.x+1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle((self.x+1)*10+2, self.y*10+2, (self.x+1)*10+12, self.y*10+12, fill='green')
+                self.display_screen.create_rectangle((self.x+1)*10+2, self.y*10+2, (self.x+1)*10+12, self.y*10+12, fill=self.playercolor)
                 self.win()
         elif d == 3: #down
             if self.grid[self.y+1][self.x] == 0:
@@ -125,7 +137,7 @@ class Window:
                 self.y = self.y+1
             elif self.grid[self.y+1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle(self.x*10+2, (self.y+1)*10+2, self.x*10+12, (self.y+1)*10+12, fill='green')
+                self.display_screen.create_rectangle(self.x*10+2, (self.y+1)*10+2, self.x*10+12, (self.y+1)*10+12, fill=self.playercolor)
                 self.win()
         self.updatedisplay()
 
@@ -148,11 +160,56 @@ class Window:
 
         self.win_text = tk.Label(self.win_window, text="Congratulations ! You made it out of the Maze")
         self.win_reset_button = tk.Button(self.win_window, text="Replay", command=lambda:self.reset(1))
-        self.win_quit_button = tk.Button(self.win_window, text="Quit", command=lambda:self.quit(1))
+        self.win_quit_button = tk.Button(self.win_window, text="Quit", command=lambda:[self.reset(), self.quit(1)])
 
         self.win_text.pack()
         self.win_reset_button.pack()
         self.win_quit_button.pack()
+
+    def changecolor(self, color):
+        if color == "":
+            color = "Black"
+        if color == "Black":
+            self.playercolor = 'grey7'
+            self.floorcolor = 'grey98'
+            self.wallcolor = 'black'
+            self.endcolor = 'grey'
+        if color == "Purple":
+            self.playercolor = 'DarkOrchid1'
+            self.floorcolor = 'lavender blush'
+            self.wallcolor = 'DarkOrchid4'
+            self.endcolor = 'purple1'
+        elif color == "Blue":
+            self.playercolor = 'blue'
+            self.floorcolor = 'lavender'
+            self.wallcolor = 'midnight blue'
+            self.endcolor = 'dodger blue'
+        elif color == "Cyan":
+            self.playercolor = 'cyan3'
+            self.floorcolor = 'azure'
+            self.wallcolor = 'cyan4'
+            self.endcolor = 'turquoise3'
+        elif color == "Green":
+            self.playercolor = 'SpringGreen3'
+            self.floorcolor = 'DarkOliveGreen1'
+            self.wallcolor = 'forest green'
+            self.endcolor = 'SpringGreen2'
+        elif color == "Yellow":
+            self.playercolor = 'yellow3'
+            self.floorcolor = 'light yellow'
+            self.wallcolor = 'gold4'
+            self.endcolor = 'yellow4'
+        elif color == "Orange":
+            self.playercolor = 'dark orange'
+            self.floorcolor = 'burlywood1'
+            self.wallcolor = 'DarkOrange4'
+            self.endcolor = 'DarkOrange2'
+        elif color == "Red":
+            self.playercolor = 'red'
+            self.floorcolor = 'pink'
+            self.wallcolor = 'red4'
+            self.endcolor = 'red2'
+        self.updatedisplay()
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Level progression will be lost. Do you want to quit?"):
@@ -189,8 +246,8 @@ class StartWindow():
     def levelcreator_entryverif(self):
         if self.levelcreator_entry.get() == "":
             return 49
-        elif int(self.levelcreator_entry.get()) < 5:
-            return 5
+        elif int(self.levelcreator_entry.get()) < 7:
+            return 7
         else:
             return int(self.levelcreator_entry.get())
 
