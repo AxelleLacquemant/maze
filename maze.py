@@ -10,9 +10,9 @@ class Window:
             level = "test"
 
         self.size = len(globals()[level])
-        self.playercolor = 'grey7'
+        self.playercolor = 'grey28'
         self.floorcolor = 'grey98'
-        self.wallcolor = 'black'
+        self.wallcolor = 'grey14'
         self.endcolor = 'grey'
 
         self.grid = globals()[level]
@@ -30,29 +30,28 @@ class Window:
         self.display_frame = tk.Frame(self.root)
         self.control_frame = tk.Frame(self.root)
         self.info_frame = tk.Frame(self.root)
+        
+        self.display_frame.pack()
+        self.control_frame.pack()
+        self.info_frame.pack()
 
-        self.display_frame.grid(row = 0, column = 0, columnspan=2)
-        self.control_frame.grid(row = 0, column = 2, columnspan=1)
-        self.info_frame.grid(row = 1, column=0, columnspan=3)
+        self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2, bg=self.floorcolor)
 
-        self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2)
-        self.color_dropdownmenu = tk.OptionMenu(self.display_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
-        self.color_button = tk.Button(self.display_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
-
-        self.color_dropdownmenu.config(width=7)
-
-        self.display_screen.grid(row=0, column=0, columnspan=2)
-        self.color_dropdownmenu.grid(row=1, column=0)
-        self.color_button.grid(row=1, column=1)
+        self.display_screen.pack()
 
         self.display_level = tk.Label(self.info_frame, text="Level: "+str(level))
         self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
         self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
+        self.color_dropdownmenu = tk.OptionMenu(self.info_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
+        self.color_button = tk.Button(self.info_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
 
-        self.display_level.pack()
-        self.display_score.pack()
-        self.reset_button.pack()
+        self.color_dropdownmenu.config(width=7)
 
+        self.display_level.grid(row=0, column=0, columnspan=3)
+        self.display_score.grid(row=1, column=0, columnspan=3)
+        self.color_dropdownmenu.grid(row=2, column=0)
+        self.color_button.grid(row=2, column=1)
+        self.reset_button.grid(row=2, column=2)
         
         self.root.bind("<Key>", self.keycontrol)
 
@@ -68,6 +67,7 @@ class Window:
 
         self.y = 0
         self.x = 0
+        self.updatebuttons()
         self.updatedisplay()
         self.findstart()
 
@@ -165,6 +165,10 @@ class Window:
             self.move(2)
         if key.keycode == 40:
             self.move(3)
+        if key.keycode == 82:
+            self.reset()
+        if key.keycode == 81:
+            self.quit()
 
     def quit(self, w=0):
         self.root.destroy()
@@ -187,9 +191,9 @@ class Window:
         if color == "":
             color = "Black"
         if color == "Black":
-            self.playercolor = 'grey7'
+            self.playercolor = 'grey28'
             self.floorcolor = 'grey98'
-            self.wallcolor = 'black'
+            self.wallcolor = 'grey14'
             self.endcolor = 'grey'
         if color == "Purple":
             self.playercolor = 'DarkOrchid1'
@@ -208,7 +212,7 @@ class Window:
             self.endcolor = 'turquoise3'
         elif color == "Green":
             self.playercolor = 'SpringGreen3'
-            self.floorcolor = 'DarkOliveGreen1'
+            self.floorcolor = 'DarkSeaGreen1'
             self.wallcolor = 'forest green'
             self.endcolor = 'SpringGreen2'
         elif color == "Yellow":
@@ -218,7 +222,7 @@ class Window:
             self.endcolor = 'yellow4'
         elif color == "Orange":
             self.playercolor = 'dark orange'
-            self.floorcolor = 'burlywood1'
+            self.floorcolor = 'wheat1'
             self.wallcolor = 'DarkOrange4'
             self.endcolor = 'DarkOrange2'
         elif color == "Red":
@@ -226,12 +230,21 @@ class Window:
             self.floorcolor = 'pink'
             self.wallcolor = 'red4'
             self.endcolor = 'red2'
+
+        self.updatebuttons()
         self.updatedisplay()
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Level progression will be lost. Do you want to quit?"):
             self.reset()
             self.root.destroy()
+
+    def updatebuttons(self):
+        uptelements = [self.color_dropdownmenu, self.color_button, self.reset_button, self.control_up, self.control_left, self.control_right, self.control_down]
+        for element in uptelements:
+            element.config(bg=self.wallcolor, foreground=self.floorcolor)
+
+        self.display_screen.config(bg=self.floorcolor)
 
 class StartWindow():
     def __init__(self):
@@ -245,7 +258,7 @@ class StartWindow():
         self.title_text = tk.Label(self.root, text="The Maze")
         self.start_text = tk.Label(self.root, text="Enter a level:")
         self.start_dropdownmenu = tk.OptionMenu(self.root, self.dropdownmenu_variable, *self.dropdownmenu_list)
-        self.start_button = tk.Button(self.root, text="Play", command=lambda:Window(self.dropdownmenu_variable.get()))
+        self.start_button = tk.Button(self.root, text="Play", command=lambda:Window(self.dropdownmenu_variable.get()), width=9)
         self.levelcreator_text = tk.Label(self.root, text="Enter grid size:")
         self.levelcreator_entry = tk.Entry(self.root)
         self.levelcreator_button = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.levelcreator_entryverif()))
