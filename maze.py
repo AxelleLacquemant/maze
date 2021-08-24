@@ -8,15 +8,17 @@ class Window:
     def __init__(self, level):
         if level == '':
             level = "test"
+
         self.size = len(globals()[level])
-        self.grid = globals()[level]
-        self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
-        self.gridcopy()
-        self.moves = 0
         self.playercolor = 'grey7'
         self.floorcolor = 'grey98'
         self.wallcolor = 'black'
         self.endcolor = 'grey'
+
+        self.grid = globals()[level]
+        self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
+        self.gridcopy()
+        self.moves = 0
 
         self.root = tk.Tk()
         self.root.title("Maze")
@@ -36,7 +38,9 @@ class Window:
         self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2)
         self.color_dropdownmenu = tk.OptionMenu(self.display_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
         self.color_button = tk.Button(self.display_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
-        
+
+        self.color_dropdownmenu.config(width=7)
+
         self.display_screen.grid(row=0, column=0, columnspan=2)
         self.color_dropdownmenu.grid(row=1, column=0)
         self.color_button.grid(row=1, column=1)
@@ -232,6 +236,8 @@ class StartWindow():
         self.levelcreator_text = tk.Label(self.root, text="Enter grid size:")
         self.levelcreator_entry = tk.Entry(self.root)
         self.levelcreator_button = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.levelcreator_entryverif()))
+
+        self.start_dropdownmenu.config(width=14)
 
         self.title_text.grid(row = 0, column = 0, columnspan = 3)
         self.start_text.grid(row = 1, column = 0)
