@@ -4,6 +4,7 @@ import math
 import os
 import level
 from level import *
+from maze import StartWindow
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 class LevelEditor():
@@ -85,6 +86,8 @@ class LevelEditor():
         nb = self.entry.get()
         with open(f"level.py", mode="a") as f:
             f.write(f"\n\n{nb}={str(self.grid)}")
+        self.levellist()
+        StartWindow.levellist(self)
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Unsaved changes will be lost. Do you want to quit?"):
