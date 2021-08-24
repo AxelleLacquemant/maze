@@ -53,6 +53,9 @@ class Window:
         self.display_score.pack()
         self.reset_button.pack()
 
+        
+        self.root.bind("<Key>", self.keycontrol)
+
         self.control_up = tk.Button(self.control_frame, text="ᐃ", width=4, height=2, command=lambda:self.move(0))
         self.control_left = tk.Button(self.control_frame, text="ᐊ", width=4, height=2, command=lambda:self.move(1))
         self.control_right = tk.Button(self.control_frame, text="ᐅ", width=4, height=2, command=lambda:self.move(2))
@@ -152,6 +155,16 @@ class Window:
         self.updatedisplay()
         if w == 1:
             self.win_window.destroy()
+
+    def keycontrol(self, key):
+        if key.keycode == 38:
+            self.move(0)
+        if key.keycode == 37:
+            self.move(1)
+        if key.keycode == 39:
+            self.move(2)
+        if key.keycode == 40:
+            self.move(3)
 
     def quit(self, w=0):
         self.root.destroy()
