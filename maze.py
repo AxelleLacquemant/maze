@@ -10,6 +10,7 @@ class Window:
             level = "test"
 
         self.size = len(globals()[level])
+        self.displaysize = 10
         self.playercolor = 'grey28'
         self.floorcolor = 'grey98'
         self.wallcolor = 'grey14'
@@ -22,7 +23,8 @@ class Window:
 
         self.root = tk.Tk()
         self.root.title("Maze")
-        self.root.resizable(0,0)
+        self.root.resizable(1,1)
+
 
         self.dropdownmenu_list = ["Black", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Red"]
         self.dropdownmenu_variable = tk.StringVar(self.root)
@@ -35,9 +37,15 @@ class Window:
         self.control_frame.pack()
         self.info_frame.pack()
 
-        self.display_screen = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2, bg=self.floorcolor)
+        self.display_screen = tk.Canvas(self.display_frame, width=self.size*self.displaysize+2, height=self.size*self.displaysize+2, bg=self.floorcolor)
+        self.displaysize_minbutton = tk.Button(self.display_frame, text="<", command=lambda:self.changesize(0))
+        self.displaysize_label = tk.Label(self.display_frame, text="Change size | 10")
+        self.displaysize_maxbutton = tk.Button(self.display_frame, text=">", command=lambda:self.changesize(1))
 
-        self.display_screen.pack()
+        self.displaysize_minbutton.grid(row=0, column=0)
+        self.displaysize_label.grid(row=0, column=1)
+        self.displaysize_maxbutton.grid(row=0, column=2)
+        self.display_screen.grid(row=1, column=0, columnspan=3)
 
         self.display_level = tk.Label(self.info_frame, text="Level: "+str(level))
         self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
@@ -72,6 +80,7 @@ class Window:
         self.findstart()
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         self.root.mainloop()
 
     def gridcopy(self, m=0):
@@ -90,13 +99,13 @@ class Window:
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] == 0:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.floorcolor, outline=self.wallcolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 1:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.wallcolor, outline=self.wallcolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.wallcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 2:
-                    self.display_screen.create_oval(j*10+3, i*10+3, j*10+11, i*10+11, fill=self.playercolor, outline=self.wallcolor)
+                    self.display_screen.create_oval(j*self.displaysize+3, i*self.displaysize+3, j*self.displaysize+(self.displaysize+1), i*self.displaysize+(self.displaysize+1), fill=self.playercolor, outline=self.wallcolor)
                 if self.grid[i][j] == 3:
-                    self.display_screen.create_rectangle(j*10+2, i*10+2, j*10+12, i*10+12, fill=self.endcolor, outline=self.playercolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.endcolor, outline=self.playercolor)
         
         self.display_score.configure(text="Moves: "+str(self.moves))
 
@@ -117,7 +126,7 @@ class Window:
                 self.y = self.y-1
             elif self.grid[self.y-1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle(self.x*10+2, (self.y-1)*10+2, self.x*10+12, (self.y-1)*10+12, fill=self.playercolor)
+                self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y-1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y-1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
         elif d == 1: #left
             if self.grid[self.y][self.x-1] == 0:
@@ -126,7 +135,7 @@ class Window:
                 self.x = self.x-1
             elif self.grid[self.y][self.x-1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle((self.x-1)*10+2, self.y*10+2, (self.x-1)*10+12, self.y*10+12, fill=self.playercolor)
+                self.display_screen.create_rectangle((self.x-1)*self.displaysize+2, self.y*self.displaysize+2, (self.x-1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
         elif d == 2: #right
             if self.grid[self.y][self.x+1] == 0:
@@ -135,7 +144,7 @@ class Window:
                 self.x = self.x+1
             elif self.grid[self.y][self.x+1] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle((self.x+1)*10+2, self.y*10+2, (self.x+1)*10+12, self.y*10+12, fill=self.playercolor)
+                self.display_screen.create_rectangle((self.x+1)*self.displaysize+2, self.y*self.displaysize+2, (self.x+1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
         elif d == 3: #down
             if self.grid[self.y+1][self.x] == 0:
@@ -144,7 +153,7 @@ class Window:
                 self.y = self.y+1
             elif self.grid[self.y+1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
-                self.display_screen.create_rectangle(self.x*10+2, (self.y+1)*10+2, self.x*10+12, (self.y+1)*10+12, fill=self.playercolor)
+                self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y+1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y+1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
         self.updatedisplay()
 
@@ -240,11 +249,23 @@ class Window:
             self.root.destroy()
 
     def updatebuttons(self):
-        uptelements = [self.color_dropdownmenu, self.color_button, self.reset_button, self.control_up, self.control_left, self.control_right, self.control_down]
+        uptelements = [self.displaysize_minbutton, self.displaysize_maxbutton, self.color_dropdownmenu, self.color_button, self.reset_button, self.control_up, self.control_left, self.control_right, self.control_down]
         for element in uptelements:
             element.config(bg=self.wallcolor, foreground=self.floorcolor)
 
         self.display_screen.config(bg=self.floorcolor)
+
+    def changesize(self, mode):
+        if mode == 0 and self.displaysize > 5:
+            self.displaysize = self.displaysize-5
+            self.displaysize_label.config(text="Change size | "+str(self.displaysize))
+        if mode == 1 and self.displaysize < 25:
+            self.displaysize = self.displaysize+5
+            self.displaysize_label.config(text="Change size | "+str(self.displaysize))
+
+        self.display_screen.config(width=self.size*self.displaysize+2, height=self.size*self.displaysize+2)
+        
+        self.updatedisplay()
 
 class StartWindow():
     def __init__(self):
