@@ -256,11 +256,11 @@ class Window:
         self.display_screen.config(bg=self.floorcolor)
 
     def changesize(self, mode):
-        if mode == 0 and self.displaysize > 5:
-            self.displaysize = self.displaysize-5
+        if mode == 0 and self.displaysize > 4:
+            self.displaysize = self.displaysize-2
             self.displaysize_label.config(text="Change size | "+str(self.displaysize))
-        if mode == 1 and self.displaysize < 25:
-            self.displaysize = self.displaysize+5
+        if mode == 1 and self.displaysize < 20:
+            self.displaysize = self.displaysize+2
             self.displaysize_label.config(text="Change size | "+str(self.displaysize))
 
         self.display_screen.config(width=self.size*self.displaysize+2, height=self.size*self.displaysize+2)
