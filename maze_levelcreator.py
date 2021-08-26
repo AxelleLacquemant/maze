@@ -82,10 +82,34 @@ class LevelEditor():
             self.grid[math.floor((event.y-2)/10)][math.floor((event.x-2)/10)] = 0
         self.updatedisplay()
 
+    def namecheck(self, checkedvar):
+        possible = ("a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","x","y","z","0","1","2","3","4","5","6","7","8","9","_","-")
+        forbiddenfirst = ("0","1","2","3","4","5","6","7","8","9","-")
+
+        if checkedvar == "":
+            checkedvar = "unamed_custom_level"
+        testlist = list(checkedvar)
+
+        for i in range(len(list(checkedvar))):
+            if list(checkedvar)[i] not in possible:
+                testlist.remove(list(checkedvar)[i])
+        
+        while testlist[0] in forbiddenfirst:
+            testlist.remove(testlist[0])
+
+        checkedvar = ''.join(testlist)
+
+        if checkedvar == "":
+            checkedvar = "unamed_custom_level"
+
+        return checkedvar
+
     def save(self):
-        nb = self.entry.get()
+        nb = self.namecheck(self.entry.get())
+
         with open(f"level.py", mode="a") as f:
             f.write(f"\n\n{nb}={str(self.grid)}")
+
         self.levellist()
         StartWindow.levellist(self)
 

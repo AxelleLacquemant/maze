@@ -1,22 +1,23 @@
 import tkinter as tk
 from tkinter import messagebox
+import random
 import level
 from level import *
 from maze_levelcreator import *
 
 class Window:
-    def __init__(self, level):
-        if level == '':
-            level = "test"
+    def __init__(self, slevel):
+        if slevel == '':
+            slevel = "test"
 
-        self.size = len(globals()[level])
+        self.size = len(globals()[slevel])
         self.displaysize = 10
         self.playercolor = 'grey28'
         self.floorcolor = 'grey98'
         self.wallcolor = 'grey14'
         self.endcolor = 'grey'
 
-        self.grid = globals()[level]
+        self.grid = globals()[slevel]
         self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
         self.gridcopy()
         self.moves = 0
@@ -25,8 +26,7 @@ class Window:
         self.root.title("Maze")
         self.root.resizable(1,1)
 
-
-        self.dropdownmenu_list = ["Black", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Red"]
+        self.dropdownmenu_list = ["Black", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Red", "Random"]
         self.dropdownmenu_variable = tk.StringVar(self.root)
 
         self.display_frame = tk.Frame(self.root)
@@ -47,7 +47,7 @@ class Window:
         self.displaysize_maxbutton.grid(row=0, column=2)
         self.display_screen.grid(row=1, column=0, columnspan=3)
 
-        self.display_level = tk.Label(self.info_frame, text="Level: "+str(level))
+        self.display_level = tk.Label(self.info_frame, text="Level: "+str(slevel))
         self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
         self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
         self.color_dropdownmenu = tk.OptionMenu(self.info_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
@@ -128,6 +128,8 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y-1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y-1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
+            else: 
+                self.moves -= 1
         elif d == 1: #left
             if self.grid[self.y][self.x-1] == 0:
                 self.grid[self.y][self.x] = 0
@@ -137,6 +139,8 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle((self.x-1)*self.displaysize+2, self.y*self.displaysize+2, (self.x-1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
+            else: 
+                self.moves -= 1
         elif d == 2: #right
             if self.grid[self.y][self.x+1] == 0:
                 self.grid[self.y][self.x] = 0
@@ -146,6 +150,8 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle((self.x+1)*self.displaysize+2, self.y*self.displaysize+2, (self.x+1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
+            else: 
+                self.moves -= 1
         elif d == 3: #down
             if self.grid[self.y+1][self.x] == 0:
                 self.grid[self.y][self.x] = 0
@@ -155,6 +161,8 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y+1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y+1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
                 self.win()
+            else: 
+                self.moves -= 1
         self.updatedisplay()
 
     def reset(self, w=0):
@@ -205,40 +213,45 @@ class Window:
             self.wallcolor = 'grey14'
             self.endcolor = 'grey'
         if color == "Purple":
-            self.playercolor = 'DarkOrchid1'
-            self.floorcolor = 'lavender blush'
-            self.wallcolor = 'DarkOrchid4'
-            self.endcolor = 'purple1'
-        elif color == "Blue":
-            self.playercolor = 'blue'
-            self.floorcolor = 'lavender'
-            self.wallcolor = 'midnight blue'
-            self.endcolor = 'dodger blue'
-        elif color == "Cyan":
-            self.playercolor = 'cyan3'
-            self.floorcolor = 'azure'
-            self.wallcolor = 'cyan4'
-            self.endcolor = 'turquoise3'
-        elif color == "Green":
-            self.playercolor = 'SpringGreen3'
-            self.floorcolor = 'DarkSeaGreen1'
-            self.wallcolor = 'forest green'
-            self.endcolor = 'SpringGreen2'
-        elif color == "Yellow":
-            self.playercolor = 'yellow3'
-            self.floorcolor = 'light yellow'
-            self.wallcolor = 'gold4'
-            self.endcolor = 'yellow4'
-        elif color == "Orange":
-            self.playercolor = 'dark orange'
-            self.floorcolor = 'wheat1'
-            self.wallcolor = 'DarkOrange4'
-            self.endcolor = 'DarkOrange2'
-        elif color == "Red":
-            self.playercolor = 'red'
-            self.floorcolor = 'pink'
-            self.wallcolor = 'red4'
-            self.endcolor = 'red2'
+            self.playercolor = '#C600F2'
+            self.floorcolor = '#FAE3FF'
+            self.wallcolor = '#7C0098'
+            self.endcolor = '#E56EFF'
+        if color == "Blue":
+            self.playercolor = '#2A00B9'
+            self.floorcolor = '#EFEEFF'
+            self.wallcolor = '#230098'
+            self.endcolor = '#6440DF'
+        if color == "Cyan":
+            self.playercolor = '#01AEA6'
+            self.floorcolor = '#EEFFFF'
+            self.wallcolor = '#008C85'
+            self.endcolor = '#00DCD2'
+        if color == "Green":
+            self.playercolor = '#009C1C'
+            self.floorcolor = '#DCFFE2'
+            self.wallcolor = '#007315'
+            self.endcolor = '#07CD2B'
+        if color == "Yellow":
+            self.playercolor = '#C7CC13'
+            self.floorcolor = '#FEFFEE'
+            self.wallcolor = '#C2B106'
+            self.endcolor = '#DADF31'
+        if color == "Orange":
+            self.playercolor = '#DC9718'
+            self.floorcolor = '#FFF4EB'
+            self.wallcolor = '#AD630B'
+            self.endcolor = '#F4AC24'
+        if color == "Red":
+            self.playercolor = '#CA1212'
+            self.floorcolor = '#FFE1E1'
+            self.wallcolor = '#9E0000'
+            self.endcolor = '#EE1A1A'
+        if color == "Random":
+            self.playercolor = "#"+("%06x"%random.randint(0,16777215))
+            self.floorcolor = 'grey'+str((random.randint(91,98)))
+            self.wallcolor = "#"+("%06x"%random.randint(0,16777215))
+            self.endcolor = "#"+("%06x"%random.randint(0,16777215))
 
         self.updatebuttons()
         self.updatedisplay()
@@ -253,7 +266,13 @@ class Window:
         for element in uptelements:
             element.config(bg=self.wallcolor, foreground=self.floorcolor)
 
-        self.display_screen.config(bg=self.floorcolor)
+        uptelementsinv = [self.displaysize_label, self.display_level, self.display_score]
+        for element in uptelementsinv:
+            element.config(bg=self.floorcolor, foreground=self.wallcolor)
+
+        uptelementsbg = [self.root, self.display_frame, self.control_frame, self.info_frame, self.display_screen]
+        for element in uptelementsbg:
+            element.config(bg=self.floorcolor)
 
     def changesize(self, mode):
         if mode == 0 and self.displaysize > 4:
@@ -297,9 +316,11 @@ class StartWindow():
         self.root.mainloop()
 
     def levelcreator_entryverif(self):
-        if self.levelcreator_entry.get() == "":
+        try:
+            int(self.levelcreator_entry.get())
+        except ValueError:
             return 49
-        elif int(self.levelcreator_entry.get()) < 7:
+        if int(self.levelcreator_entry.get()) < 7:
             return 7
         else:
             return int(self.levelcreator_entry.get())
