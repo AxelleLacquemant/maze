@@ -296,16 +296,16 @@ class StartWindow():
         self.dropdownmenu_variable = tk.StringVar(self.root)
 
         self.title_text = tk.Label(self.root, text="The Maze")
-        self.start_text = tk.Label(self.root, text="Enter a level:")
+        self.start_text = tk.Label(self.root, text="Select a level:", width=12)
         self.start_dropdownmenu = tk.OptionMenu(self.root, self.dropdownmenu_variable, *self.dropdownmenu_list)
-        self.start_button = tk.Button(self.root, text="Play", command=lambda:Window(self.dropdownmenu_variable.get()), width=9)
-        self.levelcreator_text = tk.Label(self.root, text="Enter grid size:")
+        self.start_button = tk.Button(self.root, text="Play", command=lambda:Window(self.dropdownmenu_variable.get()), width=12)
+        self.levelcreator_text = tk.Label(self.root, text="Enter grid size:", width=12)
         self.levelcreator_entry = tk.Entry(self.root)
-        self.levelcreator_button = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.levelcreator_entryverif()))
+        self.levelcreator_button = tk.Button(self.root, text="Open Editor", command=lambda:LevelEditor(self.levelcreator_entryverif()), width=12)
 
         self.start_dropdownmenu.config(width=14)
 
-        self.title_text.grid(row = 0, column = 0, columnspan = 3)
+        self.title_text.grid(row = 0, column = 0, columnspan = 3, sticky='ew')
         self.start_text.grid(row = 1, column = 0)
         self.start_dropdownmenu.grid(row = 1, column = 1)
         self.start_button.grid(row = 1, column = 2)
@@ -313,7 +313,16 @@ class StartWindow():
         self.levelcreator_entry.grid(row = 2, column = 1)
         self.levelcreator_button.grid(row = 2, column = 2)
 
+        self.updatebuttons()
+
         self.root.mainloop()
+
+    def updatebuttons(self):
+        uptelements = [self.title_text, self.start_text, self.levelcreator_text, self.start_button, self.levelcreator_button]
+        for element in uptelements:
+            element.config(bg='grey14', foreground='grey98')
+
+        self.root.config(bg='grey14')
 
     def levelcreator_entryverif(self):
         try:
