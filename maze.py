@@ -11,22 +11,25 @@ class Window:
             slevel = "test"
 
         self.size = len(globals()[slevel])
-        self.displaysize = 10
-        self.playercolor = 'grey28'
+        self.displaysize = 16
+        self.playercolor = 'green'
         self.floorcolor = 'grey98'
         self.wallcolor = 'grey14'
         self.endcolor = 'grey'
+        self.fruitcolor = 'gold'
+        self.fruittype = 'Coins'
 
         self.grid = globals()[slevel]
         self.gridsave = [[0 for _ in range(len(self.grid[i]))] for i in range(len(self.grid))]
         self.gridcopy()
         self.moves = 0
+        self.score = 0
 
         self.root = tk.Tk()
         self.root.title("Maze")
         self.root.resizable(1,1)
 
-        self.dropdownmenu_list = ["Black", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Red", "Random"]
+        self.dropdownmenu_list = ["Default", "Forest", "Sea", "Nether", "End", "Space", "Random"]
         self.dropdownmenu_variable = tk.StringVar(self.root)
 
         self.display_frame = tk.Frame(self.root)
@@ -39,7 +42,7 @@ class Window:
 
         self.display_screen = tk.Canvas(self.display_frame, width=self.size*self.displaysize+2, height=self.size*self.displaysize+2, bg=self.floorcolor)
         self.displaysize_minbutton = tk.Button(self.display_frame, text="<", command=lambda:self.changesize(0))
-        self.displaysize_label = tk.Label(self.display_frame, text="Change size | 10")
+        self.displaysize_label = tk.Label(self.display_frame, text="Change size | "+str(self.displaysize))
         self.displaysize_maxbutton = tk.Button(self.display_frame, text=">", command=lambda:self.changesize(1))
 
         self.displaysize_minbutton.grid(row=0, column=0)
@@ -48,7 +51,8 @@ class Window:
         self.display_screen.grid(row=1, column=0, columnspan=3)
 
         self.display_level = tk.Label(self.info_frame, text="Level: "+str(slevel))
-        self.display_score = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
+        self.display_moves = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
+        self.display_score = tk.Label(self.info_frame, text=self.fruittype+": "+str(self.score))
         self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
         self.color_dropdownmenu = tk.OptionMenu(self.info_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
         self.color_button = tk.Button(self.info_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
@@ -56,10 +60,11 @@ class Window:
         self.color_dropdownmenu.config(width=7)
 
         self.display_level.grid(row=0, column=0, columnspan=3)
-        self.display_score.grid(row=1, column=0, columnspan=3)
-        self.color_dropdownmenu.grid(row=2, column=0)
-        self.color_button.grid(row=2, column=1)
-        self.reset_button.grid(row=2, column=2)
+        self.display_moves.grid(row=1, column=0, columnspan=3)
+        self.display_score.grid(row=2, column=0, columnspan=3)
+        self.color_dropdownmenu.grid(row=3, column=0)
+        self.color_button.grid(row=3, column=1)
+        self.reset_button.grid(row=3, column=2)
         
         self.root.bind("<Key>", self.keycontrol)
 
@@ -75,6 +80,7 @@ class Window:
 
         self.y = 0
         self.x = 0
+        self.additems(self.grid)
         self.updatebuttons()
         self.updatedisplay()
         self.findstart()
@@ -93,6 +99,14 @@ class Window:
                 for j in range(len(self.gridsave[i])):
                     self.grid[j][i] = self.gridsave[j][i]
 
+    def additems(self, lvl):
+        for i in range(len(lvl)):
+            for j in range(len(lvl[i])):
+                if lvl[i][j] == 0:
+                    nbf = random.randint(0,7)
+                    if nbf == 7:
+                        lvl[i][j] = 4
+
     def updatedisplay(self):
         self.display_screen.delete('all')
 
@@ -106,8 +120,12 @@ class Window:
                     self.display_screen.create_oval(j*self.displaysize+3, i*self.displaysize+3, j*self.displaysize+(self.displaysize+1), i*self.displaysize+(self.displaysize+1), fill=self.playercolor, outline=self.wallcolor)
                 if self.grid[i][j] == 3:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.endcolor, outline=self.playercolor)
+                if self.grid[i][j] == 4:
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
+                    self.display_screen.create_oval(j*self.displaysize+5, i*self.displaysize+5, j*self.displaysize+(self.displaysize-1), i*self.displaysize+(self.displaysize-1), fill=self.fruitcolor, outline=self.wallcolor)
         
-        self.display_score.configure(text="Moves: "+str(self.moves))
+        self.display_moves.configure(text="Moves: "+str(self.moves))
+        self.display_score.configure(text=self.fruittype+": "+str(self.score))
 
     def findstart(self):
         for i in range(len(self.grid)):
@@ -124,6 +142,11 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.grid[self.y-1][self.x] = 2
                 self.y = self.y-1
+            elif self.grid[self.y-1][self.x] == 4:
+                self.grid[self.y][self.x] = 0
+                self.grid[self.y-1][self.x] = 2
+                self.y = self.y-1
+                self.score += 25
             elif self.grid[self.y-1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y-1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y-1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
@@ -135,6 +158,11 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.grid[self.y][self.x-1] = 2
                 self.x = self.x-1
+            elif self.grid[self.y][self.x-1] == 4:
+                self.grid[self.y][self.x] = 0
+                self.grid[self.y][self.x-1] = 2
+                self.x = self.x-1
+                self.score += 25
             elif self.grid[self.y][self.x-1] == 3:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle((self.x-1)*self.displaysize+2, self.y*self.displaysize+2, (self.x-1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
@@ -146,6 +174,11 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.grid[self.y][self.x+1] = 2
                 self.x = self.x+1
+            elif self.grid[self.y][self.x+1] == 4:
+                self.grid[self.y][self.x] = 0
+                self.grid[self.y][self.x+1] = 2
+                self.x = self.x+1
+                self.score += 25
             elif self.grid[self.y][self.x+1] == 3:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle((self.x+1)*self.displaysize+2, self.y*self.displaysize+2, (self.x+1)*self.displaysize+(self.displaysize+2), self.y*self.displaysize+(self.displaysize+2), fill=self.playercolor)
@@ -157,6 +190,11 @@ class Window:
                 self.grid[self.y][self.x] = 0
                 self.grid[self.y+1][self.x] = 2
                 self.y = self.y+1
+            elif self.grid[self.y+1][self.x] == 4:
+                self.grid[self.y][self.x] = 0
+                self.grid[self.y+1][self.x] = 2
+                self.y = self.y+1
+                self.score += 25
             elif self.grid[self.y+1][self.x] == 3:
                 self.grid[self.y][self.x] = 0
                 self.display_screen.create_rectangle(self.x*self.displaysize+2, (self.y+1)*self.displaysize+2, self.x*self.displaysize+(self.displaysize+2), (self.y+1)*self.displaysize+(self.displaysize+2), fill=self.playercolor)
@@ -167,8 +205,10 @@ class Window:
 
     def reset(self, w=0):
         self.moves = 0
+        self.score = 0
         self.gridcopy(1)
         self.findstart()
+        self.additems(self.grid)
         self.updatedisplay()
         if w == 1:
             self.win_window.destroy()
@@ -206,52 +246,55 @@ class Window:
 
     def changecolor(self, color):
         if color == "":
-            color = "Black"
-        if color == "Black":
-            self.playercolor = 'grey28'
+            color = "Default"
+        if color == "Default":
+            self.playercolor = 'green'
             self.floorcolor = 'grey98'
             self.wallcolor = 'grey14'
             self.endcolor = 'grey'
-        if color == "Purple":
-            self.playercolor = '#C600F2'
-            self.floorcolor = '#FAE3FF'
-            self.wallcolor = '#7C0098'
-            self.endcolor = '#E56EFF'
-        if color == "Blue":
-            self.playercolor = '#2A00B9'
-            self.floorcolor = '#EFEEFF'
-            self.wallcolor = '#230098'
-            self.endcolor = '#6440DF'
-        if color == "Cyan":
-            self.playercolor = '#01AEA6'
-            self.floorcolor = '#EEFFFF'
-            self.wallcolor = '#008C85'
-            self.endcolor = '#00DCD2'
-        if color == "Green":
-            self.playercolor = '#009C1C'
-            self.floorcolor = '#DCFFE2'
-            self.wallcolor = '#007315'
-            self.endcolor = '#07CD2B'
-        if color == "Yellow":
-            self.playercolor = '#C7CC13'
-            self.floorcolor = '#FEFFEE'
-            self.wallcolor = '#C2B106'
-            self.endcolor = '#DADF31'
-        if color == "Orange":
-            self.playercolor = '#DC9718'
-            self.floorcolor = '#FFF4EB'
-            self.wallcolor = '#AD630B'
-            self.endcolor = '#F4AC24'
-        if color == "Red":
-            self.playercolor = '#CA1212'
-            self.floorcolor = '#FFE1E1'
-            self.wallcolor = '#9E0000'
-            self.endcolor = '#EE1A1A'
+            self.fruitcolor = 'gold'
+            self.fruittype = 'Coins'
+        if color == "Forest":
+            self.playercolor = '#815B40'
+            self.floorcolor = '#E4FFD2'
+            self.wallcolor = '#286200'
+            self.endcolor = '#89AF4F'
+            self.fruitcolor = '#D10000'
+            self.fruittype = 'Apples'
+        if color == "Sea":
+            self.playercolor = '#E8852E'
+            self.floorcolor = '#B5DAF0'
+            self.wallcolor = '#1B184B'
+            self.endcolor = '#56A9D8'
+            self.fruitcolor = '#E1BFA0'
+            self.fruittype = 'Smaller fishes'
+        if color == "Nether":
+            self.playercolor = '#806946'
+            self.floorcolor = '#BB6E65'
+            self.wallcolor = '#5B0000'
+            self.endcolor = '#C15353'
+            self.fruitcolor = '#FED740'
+            self.fruittype = 'Gold Ingots'
+        if color == "End":
+            self.playercolor = '#302C2F'
+            self.floorcolor = '#F4FAD7'
+            self.wallcolor = '#370D37'
+            self.endcolor = '#8F937B'
+            self.fruitcolor = '#258373'
+            self.fruittype = 'Ender Pearls'
+        if color == "Space":
+            self.playercolor = '#F1F1F1'
+            self.floorcolor = 'black'
+            self.wallcolor = '#454545'
+            self.endcolor = '#121212'
+            self.fruitcolor = '#00FF00'
+            self.fruittype = 'Uranium'
         if color == "Random":
             self.playercolor = "#"+("%06x"%random.randint(0,16777215))
-            self.floorcolor = 'grey'+str((random.randint(91,98)))
+            self.floorcolor = "#"+("%06x"%random.randint(0,16777215))
             self.wallcolor = "#"+("%06x"%random.randint(0,16777215))
             self.endcolor = "#"+("%06x"%random.randint(0,16777215))
+            self.fruitcolor = "#"+("%06x"%random.randint(0,16777215))
 
         self.updatebuttons()
         self.updatedisplay()
@@ -266,7 +309,7 @@ class Window:
         for element in uptelements:
             element.config(bg=self.wallcolor, foreground=self.floorcolor)
 
-        uptelementsinv = [self.displaysize_label, self.display_level, self.display_score]
+        uptelementsinv = [self.displaysize_label, self.display_level, self.display_moves, self.display_score]
         for element in uptelementsinv:
             element.config(bg=self.floorcolor, foreground=self.wallcolor)
 
@@ -274,11 +317,15 @@ class Window:
         for element in uptelementsbg:
             element.config(bg=self.floorcolor)
 
+        hlbgelements = [self.display_screen, self.color_dropdownmenu]
+        for element in hlbgelements:
+            element.config(highlightbackground=self.floorcolor)
+
     def changesize(self, mode):
-        if mode == 0 and self.displaysize > 4:
+        if mode == 0 and self.displaysize > 10:
             self.displaysize = self.displaysize-2
             self.displaysize_label.config(text="Change size | "+str(self.displaysize))
-        if mode == 1 and self.displaysize < 20:
+        if mode == 1 and self.displaysize < 30:
             self.displaysize = self.displaysize+2
             self.displaysize_label.config(text="Change size | "+str(self.displaysize))
 
@@ -289,7 +336,7 @@ class Window:
 class StartWindow():
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title = "Maze"
+        self.root.title("Maze")
 
         self.dropdownmenu_list = []
         self.levellist()
@@ -321,6 +368,8 @@ class StartWindow():
         uptelements = [self.title_text, self.start_text, self.levelcreator_text, self.start_button, self.levelcreator_button]
         for element in uptelements:
             element.config(bg='grey14', foreground='grey98')
+
+        self.start_dropdownmenu.config(highlightbackground='grey14')
 
         self.root.config(bg='grey14')
 

@@ -14,28 +14,36 @@ class LevelEditor():
         self.grid = [[self.border_test(i,j) for i in range(self.size)] for j in range(self.size)]
 
         self.root = tk.Tk()
+        self.root.title("Editor")
+
+        self.display_frame = tk.Frame(self.root)
+        self.buttons_frame = tk.Frame(self.root)
 
         self.dropdownmenu_list = []
         self.levellist()
-        self.dropdownmenu_variable = tk.StringVar(self.root)
+        self.dropdownmenu_variable = tk.StringVar(self.buttons_frame)
 
-        self.canvas = tk.Canvas(self.root, width=self.size*10+2, height=self.size*10+2)
-        self.start_dropdownmenu = tk.OptionMenu(self.root, self.dropdownmenu_variable, *self.dropdownmenu_list)
-        self.choose_button = tk.Button(self.root, text="Load file", command=lambda:self.loadfile(self.dropdownmenu_variable.get()), width=17)
-        self.random_button = tk.Button(self.root, text="Randomize", command=self.randomize, width=17)
-        self.entry = tk.Entry(self.root)
-        self.save_button = tk.Button(self.root, text="Save level", command=self.save, width=17)
+        self.canvas = tk.Canvas(self.display_frame, width=self.size*10+2, height=self.size*10+2)
+        self.start_dropdownmenu = tk.OptionMenu(self.buttons_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
+        self.choose_button = tk.Button(self.buttons_frame, text="Load file", command=lambda:self.loadfile(self.dropdownmenu_variable.get()), width=17)
+        self.random_button = tk.Button(self.buttons_frame, text="Randomize", command=self.randomize, width=17)
+        self.entry = tk.Entry(self.buttons_frame)
+        self.save_button = tk.Button(self.buttons_frame, text="Save level", command=self.save, width=17)
 
         self.start_dropdownmenu.config(width=14)
 
         self.canvas.bind("<Button-1>", self.clicked)
 
-        self.canvas.grid(row=0, column=0, columnspan=3)
-        self.start_dropdownmenu.grid(row=1, column=0)
-        self.choose_button.grid(row=2, column=0)
-        self.random_button.grid(row=2, column=1)
-        self.entry.grid(row=1, column=2)
-        self.save_button.grid(row=2, column=2)
+        self.display_frame.pack()
+        self.buttons_frame.pack()
+
+        self.canvas.pack()
+
+        self.start_dropdownmenu.grid(row=0, column=0)
+        self.choose_button.grid(row=1, column=0)
+        self.random_button.grid(row=1, column=0, columnspan=2)
+        self.entry.grid(row=0, column=2)
+        self.save_button.grid(row=1, column=2)
 
         self.updatebuttons()
         self.updatedisplay()
@@ -44,11 +52,17 @@ class LevelEditor():
         self.root.mainloop()
 
     def updatebuttons(self):
-        uptelements = [self.start_dropdownmenu, self.choose_button, self.random_button, self.save_button]
-        for element in uptelements:
+        bgelements = [self.start_dropdownmenu, self.choose_button, self.random_button, self.save_button]
+        for element in bgelements:
             element.config(bg='grey14', foreground='grey98')
 
-        self.root.config(bg='grey98')
+        uptelementsbg = [self.root, self.display_frame, self.buttons_frame]
+        for element in uptelementsbg:
+            element.config(bg='grey14')
+
+        hlbgelements = [self.canvas, self.start_dropdownmenu]
+        for element in hlbgelements:
+            element.config(highlightbackground='grey14')
 
     def updatedisplay(self):
         self.canvas.delete("all")
