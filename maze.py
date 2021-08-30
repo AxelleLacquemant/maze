@@ -159,17 +159,24 @@ class Window:
 
     def enemybehavior(self):
         self.killplayer()
-        b = random.randint(0,3)
-        if b == 0:
+        b = random.randint(0,13)
+        if b == 1 or b == 5 or b == 9:
             self.enemyup()
-        if b == 1:
+        if b == 2 or b == 6 or b == 10:
             self.enemyright()
-        if b == 2:
+        if b == 3 or b == 7 or b == 11:
             self.enemydown()
-        if b == 3:
+        if b == 4 or b == 8 or b == 12:
             self.enemyleft()
+        if b == 0:
+            self.enemyteleport()
         self.killplayer()
         self.updatedisplay()
+
+    def enemyteleport(self):
+        self.grid[self.eny][self.enx] = 0
+        self.addenemy(self.grid)
+        self.findstart()
 
     def enemyup(self):
         if self.grid[self.eny-1][self.enx] == 0 or self.grid[self.eny-1][self.enx] == 4:
