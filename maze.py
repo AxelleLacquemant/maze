@@ -143,18 +143,19 @@ class Window:
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] == 0:
-                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.floorcolor)
                 if self.grid[i][j] == 1:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.wallcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 2:
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.floorcolor)
                     self.display_screen.create_oval(j*self.displaysize+3, i*self.displaysize+3, j*self.displaysize+(self.displaysize+1), i*self.displaysize+(self.displaysize+1), fill=self.playercolor, outline=self.playercolor)
                 if self.grid[i][j] == 3:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.endcolor, outline=self.playercolor)
                 if self.grid[i][j] == 4:
-                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.floorcolor)
                     self.display_screen.create_oval(j*self.displaysize+5, i*self.displaysize+5, j*self.displaysize+(self.displaysize-1), i*self.displaysize+(self.displaysize-1), fill=self.fruitcolor, outline=self.fruitcolor)
                 if self.grid[i][j] == 5:
-                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
+                    self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.floorcolor)
                     self.display_screen.create_oval(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.enemycolor, outline=self.enemycolor)
         
         self.display_moves.configure(text="Moves: "+str(self.moves))
