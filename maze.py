@@ -10,8 +10,10 @@ class Window:
         if slevel == '':
             slevel = "test"
 
+        self.lvlname = self.getname(slevel)
         self.size = len(globals()[slevel])
         self.displaysize = 16
+        self.enemy = False
         self.playercolor = 'green'
         self.floorcolor = 'grey98'
         self.wallcolor = 'grey14'
@@ -31,7 +33,7 @@ class Window:
         self.root.title("Maze")
         self.root.resizable(1,1)
 
-        self.dropdownmenu_list = ["Default", "Forest", "Sea", "Nether", "End", "Space", "Random"]
+        self.dropdownmenu_list = ["Default", "Forest", "Sea", "Sky", "Space", "Nether", "End", "Random"]
         self.dropdownmenu_variable = tk.StringVar(self.root)
 
         self.display_frame = tk.Frame(self.root)
@@ -52,7 +54,7 @@ class Window:
         self.displaysize_maxbutton.grid(row=0, column=2)
         self.display_screen.grid(row=1, column=0, columnspan=3)
 
-        self.display_level = tk.Label(self.info_frame, text="Level: "+str(slevel))
+        self.display_level = tk.Label(self.info_frame, text="Level: "+(str(self.lvlname).capitalize()))
         self.display_moves = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
         self.display_score = tk.Label(self.info_frame, text=self.fruittype+": "+str(self.score))
         self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
@@ -85,7 +87,8 @@ class Window:
         self.eny = 0
         self.enx = 0
         self.additems(self.grid)
-        self.addenemy(self.grid)
+        if self.size > 7 or self.lvlname == "test":
+            self.addenemy(self.grid)
         self.updatebuttons()
         self.updatedisplay()
         self.findstart()
@@ -93,6 +96,16 @@ class Window:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.root.mainloop()
+
+    def getname(self, slevel):
+        listlvl = list(slevel)
+        for i in range(len(listlvl)):
+            if listlvl[i] == "_":
+                listlvl[i] = " "
+        displayname = ""
+        for element in listlvl:
+            displayname += element
+        return displayname
 
     def gridcopy(self, m=0):
         if m == 0:
@@ -113,15 +126,15 @@ class Window:
                         lvl[i][j] = 4
 
     def addenemy(self, lvl):
-        enemy = False
-        while enemy == False:
+        self.enemy = False
+        while self.enemy == False:
             for i in range(len(lvl)):
                 for j in range(len(lvl[i])):
                     if lvl[i][j] == 0:
                         nbf = random.randint(0,self.size*self.size)
                         if nbf == 0:
                             lvl[i][j] = 5
-                            enemy = True
+                            self.enemy = True
                             return
 
     def updatedisplay(self):
@@ -134,15 +147,15 @@ class Window:
                 if self.grid[i][j] == 1:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.wallcolor, outline=self.wallcolor)
                 if self.grid[i][j] == 2:
-                    self.display_screen.create_oval(j*self.displaysize+3, i*self.displaysize+3, j*self.displaysize+(self.displaysize+1), i*self.displaysize+(self.displaysize+1), fill=self.playercolor, outline=self.wallcolor)
+                    self.display_screen.create_oval(j*self.displaysize+3, i*self.displaysize+3, j*self.displaysize+(self.displaysize+1), i*self.displaysize+(self.displaysize+1), fill=self.playercolor, outline=self.playercolor)
                 if self.grid[i][j] == 3:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.endcolor, outline=self.playercolor)
                 if self.grid[i][j] == 4:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
-                    self.display_screen.create_oval(j*self.displaysize+5, i*self.displaysize+5, j*self.displaysize+(self.displaysize-1), i*self.displaysize+(self.displaysize-1), fill=self.fruitcolor, outline=self.wallcolor)
+                    self.display_screen.create_oval(j*self.displaysize+5, i*self.displaysize+5, j*self.displaysize+(self.displaysize-1), i*self.displaysize+(self.displaysize-1), fill=self.fruitcolor, outline=self.fruitcolor)
                 if self.grid[i][j] == 5:
                     self.display_screen.create_rectangle(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.floorcolor, outline=self.wallcolor)
-                    self.display_screen.create_oval(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.enemycolor, outline=self.wallcolor)
+                    self.display_screen.create_oval(j*self.displaysize+2, i*self.displaysize+2, j*self.displaysize+(self.displaysize+2), i*self.displaysize+(self.displaysize+2), fill=self.enemycolor, outline=self.enemycolor)
         
         self.display_moves.configure(text="Moves: "+str(self.moves))
         self.display_score.configure(text=self.fruittype+": "+str(self.score))
@@ -175,7 +188,8 @@ class Window:
 
     def enemyteleport(self):
         self.grid[self.eny][self.enx] = 0
-        self.addenemy(self.grid)
+        if self.size > 7 or self.lvlname == "test":
+            self.addenemy(self.grid)
         self.findstart()
 
     def enemyup(self):
@@ -331,14 +345,16 @@ class Window:
             else: 
                 self.moves -= 1
         self.updatedisplay()
-        self.enemybehavior()
+        if self.enemy == True:
+            self.enemybehavior()
 
     def reset(self, w=0):
         self.moves = 0
         self.score = 0
         self.gridcopy(1)
         self.additems(self.grid)
-        self.addenemy(self.grid)
+        if self.size > 7 or self.lvlname == "test":
+            self.addenemy(self.grid)
         self.findstart()
         self.updatedisplay()
         self.root.bind("<Key>", self.keycontrol)
@@ -346,18 +362,22 @@ class Window:
             self.win_window.destroy()
 
     def keycontrol(self, key):
-        if key.keycode == 38:
+        if key.keycode == 38: #^
             self.move(0)
-        if key.keycode == 37:
+        if key.keycode == 37: #<
             self.move(1)
-        if key.keycode == 39:
+        if key.keycode == 39: #>
             self.move(2)
-        if key.keycode == 40:
+        if key.keycode == 40: #V
             self.move(3)
-        if key.keycode == 82:
+        if key.keycode == 82: #q
             self.reset()
-        if key.keycode == 81:
+        if key.keycode == 81: #q
             self.quit()
+        if key.keycode == 109: #-
+            self.changesize(0)
+        if key.keycode == 107: #+
+            self.changesize(1)
 
     def quit(self, w=0):
         self.root.destroy()
@@ -368,15 +388,20 @@ class Window:
         self.root.unbind("<Key>")
 
         self.win_window = tk.Tk()
-        self.win_window.title("Win !")
         if mode==0:
+            self.win_window.title("Win !")
             self.win_text = tk.Label(self.win_window, text="Congratulations ! You made it out of the Maze")
+            self.win_score = tk.Label(self.win_window, text="Score: "+str(round(self.score/self.moves*100)))
         if mode==1:
+            self.win_window.title("Lost :(")
             self.win_text = tk.Label(self.win_window, text="Oh no ! The "+self.enemytype+" got you!")
+            self.win_score = tk.Label(self.win_window, text="Score: "+str(round(self.score/self.moves*100-self.size*100)))
+
         self.win_reset_button = tk.Button(self.win_window, text="Replay", command=lambda:self.reset(1))
         self.win_quit_button = tk.Button(self.win_window, text="Quit", command=lambda:[self.reset(), self.quit(1)])
 
         self.win_text.pack()
+        self.win_score.pack()
         self.win_reset_button.pack()
         self.win_quit_button.pack()
 
@@ -393,25 +418,43 @@ class Window:
             self.fruittype = 'Coins'
             self.enemytype = 'Minotaur'
         if color == "Forest":
-            self.playercolor = '#815B40'
+            self.playercolor = '#89805A'
             self.floorcolor = '#E4FFD2'
             self.wallcolor = '#286200'
             self.endcolor = '#89AF4F'
             self.fruitcolor = '#D10000'
             self.enemycolor = '#614E43'
             self.fruittype = 'Berries'
-            self.enemytype = 'Hunter'
+            self.enemytype = 'bear'
         if color == "Sea":
-            self.playercolor = '#E8852E'
+            self.playercolor = '#EFEFEF'
             self.floorcolor = '#B5DAF0'
             self.wallcolor = '#1B184B'
             self.endcolor = '#56A9D8'
             self.fruitcolor = '#E1BFA0'
-            self.enemycolor = '#0B4558'
+            self.enemycolor = '#E8852E'
             self.fruittype = 'Smaller fishes'
-            self.enemytype = 'Bigger fish'
+            self.enemytype = 'bigger fish'
+        if color == "Sky":
+            self.playercolor = '#A9A9A9'
+            self.floorcolor = '#FFFFFF'
+            self.wallcolor = '#76ECFF'
+            self.endcolor = '#B5FBFF'
+            self.fruitcolor = '#FFCC46'
+            self.enemycolor = '#525D5F'
+            self.fruittype = 'Fruits'
+            self.enemytype = 'big bird'
+        if color == "Space":
+            self.playercolor = '#F1F1F1'
+            self.floorcolor = 'black'
+            self.wallcolor = '#454545'
+            self.endcolor = '#121212'
+            self.fruitcolor = '#00FF00'
+            self.enemycolor = '#078544'
+            self.fruittype = 'Uranium'
+            self.enemytype = 'alien'
         if color == "Nether":
-            self.playercolor = '#806946'
+            self.playercolor = '#DAD4CF'
             self.floorcolor = '#BB6E65'
             self.wallcolor = '#5B0000'
             self.endcolor = '#C15353'
@@ -428,23 +471,15 @@ class Window:
             self.enemycolor = '#B170B1'
             self.fruittype = 'Ender Pearls'
             self.enemytype = 'Ender Dragon'
-        if color == "Space":
-            self.playercolor = '#F1F1F1'
-            self.floorcolor = 'black'
-            self.wallcolor = '#454545'
-            self.endcolor = '#121212'
-            self.fruitcolor = '#00FF00'
-            self.enemycolor = '#0D8544'
-            self.fruittype = 'Uranium'
-            self.enemytype = 'Alien ship'
         if color == "Random":
             self.playercolor = "#"+("%06x"%random.randint(0,16777215))
             self.floorcolor = "#"+("%06x"%random.randint(0,16777215))
             self.wallcolor = "#"+("%06x"%random.randint(0,16777215))
             self.endcolor = "#"+("%06x"%random.randint(0,16777215))
             self.fruitcolor = "#"+("%06x"%random.randint(0,16777215))
-            self.fruittype = 'Strange Stuff'
             self.enemycolor = "#"+("%06x"%random.randint(0,16777215))
+            self.fruittype = 'Strange stuff'
+            self.enemytype = 'strange thing'
 
         self.updatebuttons()
         self.updatedisplay()
