@@ -34,7 +34,7 @@ class Window:
         self.root.resizable(1,1)
 
         self.dropdownmenu_list = ["Default", "Forest", "Sea", "Sky", "Space", "Nether", "End", "Random"]
-        self.dropdownmenu_variable = tk.StringVar(self.root)
+        self.dropdownmenu_variable = tk.StringVar(self.root, "Default")
 
         self.display_frame = tk.Frame(self.root)
         self.control_frame = tk.Frame(self.root)
@@ -58,8 +58,7 @@ class Window:
         self.display_moves = tk.Label(self.info_frame, text="Moves: "+str(self.moves))
         self.display_score = tk.Label(self.info_frame, text=self.fruittype+": "+str(self.score))
         self.reset_button = tk.Button(self.info_frame, text="Reset", command=self.reset)
-        self.color_dropdownmenu = tk.OptionMenu(self.info_frame, self.dropdownmenu_variable, *self.dropdownmenu_list)
-        self.color_button = tk.Button(self.info_frame, text="Change Theme", command=lambda:self.changecolor(self.dropdownmenu_variable.get()))
+        self.color_dropdownmenu = tk.OptionMenu(self.info_frame, self.dropdownmenu_variable, *self.dropdownmenu_list, command=self.changecolor)
 
         self.color_dropdownmenu.config(width=7)
 
@@ -67,7 +66,6 @@ class Window:
         self.display_moves.grid(row=1, column=0, columnspan=3)
         self.display_score.grid(row=2, column=0, columnspan=3)
         self.color_dropdownmenu.grid(row=3, column=0)
-        self.color_button.grid(row=3, column=1)
         self.reset_button.grid(row=3, column=2)
         
         self.root.bind("<Key>", self.keycontrol)
@@ -491,7 +489,7 @@ class Window:
             self.root.destroy()
 
     def updatebuttons(self):
-        uptelements = [self.displaysize_minbutton, self.displaysize_maxbutton, self.color_dropdownmenu, self.color_button, self.reset_button, self.control_up, self.control_left, self.control_right, self.control_down]
+        uptelements = [self.displaysize_minbutton, self.displaysize_maxbutton, self.color_dropdownmenu, self.reset_button, self.control_up, self.control_left, self.control_right, self.control_down]
         for element in uptelements:
             element.config(bg=self.wallcolor, foreground=self.floorcolor)
 
