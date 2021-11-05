@@ -126,8 +126,8 @@ class Window:
     def addenemy(self, lvl):
         self.enemy = False
         while self.enemy == False:
-            for i in range(len(lvl)):
-                for j in range(len(lvl[i])):
+            for i in range(round((len(lvl))/2), len(lvl)):
+                for j in range(round((len(lvl))/2), len(lvl)):
                     if lvl[i][j] == 0:
                         nbf = random.randint(0,self.size*self.size)
                         if nbf == 0:
@@ -171,97 +171,39 @@ class Window:
 
     def enemybehavior(self):
         self.killplayer()
-        b = random.randint(0,13)
-        if b == 1 or b == 5 or b == 9:
-            self.enemyup()
-        if b == 2 or b == 6 or b == 10:
-            self.enemyright()
-        if b == 3 or b == 7 or b == 11:
-            self.enemydown()
-        if b == 4 or b == 8 or b == 12:
-            self.enemyleft()
-        if b == 0:
-            self.enemyteleport()
+        self.distx = self.x - self.enx
+        self.disty = self.y - self.eny
+        
+        if self.moves%6 == 0:
+            if self.distx < 0:
+                self.enemymove(3)
+            elif self.distx > 0:
+                self.enemymove(1)
+            if self.disty < 0:
+                self.enemymove(0)
+            elif self.disty > 0:
+                self.enemymove(2)
+
         self.killplayer()
         self.updatedisplay()
 
-    def enemyteleport(self):
-        self.grid[self.eny][self.enx] = 0
-        if self.size > 7 or self.lvlname == "test":
-            self.addenemy(self.grid)
-        self.findstart()
-
-    def enemyup(self):
-        if self.grid[self.eny-1][self.enx] == 0 or self.grid[self.eny-1][self.enx] == 4:
+    def enemymove(self, d):
+        if d == 0: #up
             self.grid[self.eny][self.enx] = 0
             self.grid[self.eny-1][self.enx] = 5
             self.eny = self.eny-1
-        elif self.grid[self.eny][self.enx+1] == 0 or self.grid[self.eny][self.enx+1] == 4:
+        elif d == 1: #right
             self.grid[self.eny][self.enx] = 0
             self.grid[self.eny][self.enx+1] = 5
             self.enx = self.enx+1
-        elif self.grid[self.eny+1][self.enx] == 0 or self.grid[self.eny+1][self.enx] == 4:
+        elif d == 2: #down
             self.grid[self.eny][self.enx] = 0
             self.grid[self.eny+1][self.enx] = 5
             self.eny = self.eny+1
-        elif self.grid[self.eny][self.enx-1] == 0 or self.grid[self.eny][self.enx-1] == 4:
+        else: #left
             self.grid[self.eny][self.enx] = 0
             self.grid[self.eny][self.enx-1] = 5
             self.enx = self.enx-1
-
-    def enemyright(self):
-        if self.grid[self.eny][self.enx+1] == 0 or self.grid[self.eny][self.enx+1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx+1] = 5
-            self.enx = self.enx+1
-        elif self.grid[self.eny+1][self.enx] == 0 or self.grid[self.eny+1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny+1][self.enx] = 5
-            self.eny = self.eny+1
-        elif self.grid[self.eny][self.enx-1] == 0 or self.grid[self.eny][self.enx-1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx-1] = 5
-            self.enx = self.enx-1
-        elif self.grid[self.eny-1][self.enx] == 0 or self.grid[self.eny-1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny-1][self.enx] = 5
-            self.eny = self.eny-1
-
-    def enemydown(self):
-        if self.grid[self.eny+1][self.enx] == 0 or self.grid[self.eny+1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny+1][self.enx] = 5
-            self.eny = self.eny+1
-        elif self.grid[self.eny][self.enx-1] == 0 or self.grid[self.eny][self.enx-1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx-1] = 5
-            self.enx = self.enx-1
-        elif self.grid[self.eny-1][self.enx] == 0 or self.grid[self.eny-1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny-1][self.enx] = 5
-            self.eny = self.eny-1
-        elif self.grid[self.eny][self.enx+1] == 0 or self.grid[self.eny][self.enx+1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx+1] = 5
-            self.enx = self.enx+1
-
-    def enemyleft(self):
-        if self.grid[self.eny][self.enx-1] == 0 or self.grid[self.eny][self.enx-1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx-1] = 5
-            self.enx = self.enx-1
-        elif self.grid[self.eny-1][self.enx] == 0 or self.grid[self.eny-1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny-1][self.enx] = 5
-            self.eny = self.eny-1
-        elif self.grid[self.eny][self.enx+1] == 0 or self.grid[self.eny][self.enx+1] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny][self.enx+1] = 5
-            self.enx = self.enx+1
-        elif self.grid[self.eny+1][self.enx] == 0 or self.grid[self.eny+1][self.enx] == 4:
-            self.grid[self.eny][self.enx] = 0
-            self.grid[self.eny+1][self.enx] = 5
-            self.eny = self.eny+1
 
     def killplayer(self):
         if self.grid[self.eny-1][self.enx] == 2:
